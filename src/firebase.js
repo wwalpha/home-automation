@@ -13,5 +13,8 @@ app.auth().signInWithPopup(provider).then((result) => {
   // const token = result.credential.accessToken;
 }).catch(err => console.error(err));
 
+app.database.ref('/').on('value', (snapshot) => {
+  console.log(snapshot);
+});
 
 module.exports = app;
