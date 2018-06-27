@@ -4,5 +4,6 @@
   "eslint.run": "onSave",
   "eslint.workingDirectories": [
     "src"
-  ]
+  ],
+  "python.pythonPath": "D:\\Code\\Tools\\Python36"
 }

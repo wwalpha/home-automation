@@ -18,6 +18,10 @@
     "module": true,
     "require": true
   },
+  "plugins": [
+    "react",
+    "import"
+  ],
   "rules": {
     "indent": [
       "error",
@@ -38,6 +42,13 @@
     "max-len": [
       "error",
       160
+    ],
+    "prefer-destructuring": [
+      "error",
+      {
+        "object": true,
+        "array": false
+      }
     ]
   },
   "settings": {
