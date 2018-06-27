@@ -1,45 +1,6 @@
-var Request = require('request');
-var Q = require('q');
-var StringFormat = require('string-format');
-
+const Request = require('request');
+const Q = require('q');
 const os = require('os');
-
-function BraviaAuth(discovery) {
-  this.discovery = discovery;
-  this.clientId = '{hostname}:642a76ca-9102-11e6-ae22-56b6b6499611';
-  this.nickname = 'node-bravia-androidtv ({hostname})';
-}
-
-BraviaAuth.prototype.getCookie = function(code) {
-  var deferred = Q.defer();
-
-  if (this.cookie) {
-    deferred.resolve(this.cookie);
-  } else {
-    var self = this;
-    this.discovery.getUrl().then(function(url) {
-      var clientId = self.clientId.format({hostname: hostname()});
-      var nickname = self.nickname.format({hostname: os.hostname()});
-      authRequest(url, clientId, nickname, code).then(function(response) {
-        if (response.statusCode == 200) {
-          var cookie = parseCookie(response.headers);
-          self.cookie = cookie;
-          deferred.resolve(cookie);
-        } else if (response.statusCode == 401) {
-          deferred.resolve();
-        } else {
-          deferred.reject('Unexpected '+response.statusCode+' response');
-        }
-      }, deferred.reject);
-    }, deferred.reject);
-  }
-
-  return deferred.promise;
-};
-
-BraviaAuth.prototype.clearCookie = function() {
-  this.cookie = null;
-};
 
 function hostname() {
   os.hostname()
@@ -49,16 +10,16 @@ function hostname() {
 }
 
 function authRequest(url, clientId, nickname, code) {
-  var deferred = Q.defer();
+  const deferred = Q.defer();
 
-  var headers = {};
+  const headers = {};
   if (code !== undefined) {
-    headers['Authorization'] = 'Basic ' + new Buffer(':' + code).toString('base64');
+    headers.Authorization = `Basic ${Buffer.from(`:${code}`).toString('base64')}`;
   }
 
   Request.post({
     method: 'POST',
-    uri: url + '/accessControl',
+    uri: `${url}/accessControl`,
     json: {
       id: 1,
       method: 'actRegister',
@@ -66,22 +27,22 @@ function authRequest(url, clientId, nickname, code) {
       params: [
         {
           clientid: clientId,
-          nickname: nickname,
-          level: 'private'
+          nickname,
+          level: 'private',
         },
         [
           {
             value: 'yes',
-            function: 'WOL'
-          }
-        ]
-      ]
+            function: 'WOL',
+          },
+        ],
+      ],
     },
-    headers: headers
-  }, function (error, response, body) {
+    headers,
+  }, (error, response) => {
     if (!error) {
       deferred.resolve(response);
-    } else{
+    } else {
       deferred.reject(error);
     }
   });
@@ -91,6 +52,47 @@ function authRequest(url, clientId, nickname, code) {
 
 function parseCookie(headers) {
   return headers['set-cookie'][0].split(';')[0];
-};
+}
+
+
+class BraviaAuth {
+  constructor(discovery) {
+    this.discovery = discovery;
+    this.clientId = '{hostname}:642a76ca-9102-11e6-ae22-56b6b6499611';
+    this.nickname = 'node-bravia-androidtv ({hostname})';
+  }
+
+  getCookie(code) {
+    const deferred = Q.defer();
+
+    if (this.cookie) {
+      deferred.resolve(this.cookie);
+    } else {
+      const self = this;
+      console.log(this.discovery.getUrl());
+      this.discovery.getUrl().then((url) => {
+        const clientId = self.clientId.format({ hostname: hostname() });
+        const nickname = self.nickname.format({ hostname: os.hostname() });
+        authRequest(url, clientId, nickname, code).then((response) => {
+          if (response.statusCode === 200) {
+            const cookie = parseCookie(response.headers);
+            self.cookie = cookie;
+            deferred.resolve(cookie);
+          } else if (response.statusCode === 401) {
+            deferred.resolve();
+          } else {
+            deferred.reject(`Unexpected ${response.statusCode} response`);
+          }
+        }, deferred.reject);
+      }, deferred.reject);
+    }
+
+    return deferred.promise;
+  }
+
+  clearCookie() {
+    this.cookie = null;
+  }
+}
 
 module.exports = BraviaAuth;

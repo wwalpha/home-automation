@@ -12,6 +12,7 @@ if (process.argv[2] === 'playing') {
 } else if (process.argv[2] === 'display') {
   deferred = bravia.getPowerSavingMode();
 } else {
+  console.log(333);
   deferred = bravia.getPowerStatus();
 }
 

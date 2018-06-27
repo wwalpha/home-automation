@@ -4,16 +4,6 @@ const wol = require('wake_on_lan');
 const Request = require('request');
 const { parseString } = require('xml2js');
 
-function BraviaDiscovery(ip, mac, filter) {
-  this.ssdpClient = new SsdpClient();
-  this.st = 'urn:schemas-sony-com:service:IRCC:1';
-  this.url = 'http://{ip}/sony';
-
-  this.ip = ip;
-  this.mac = mac;
-  this.filter = filter;
-}
-
 const validateDescription = (body, filter, successAction) => {
   parseString(body, (err, result) => {
     if (!err) {
@@ -28,6 +18,7 @@ const validateDescription = (body, filter, successAction) => {
   });
 };
 
+
 const getDescription = (loc, filter, successAction) => {
   Request.get({
     method: 'GET',
@@ -40,7 +31,7 @@ const getDescription = (loc, filter, successAction) => {
 };
 
 
-function wakeOnLan(mac) {
+const wakeOnLan = (mac) => {
   const deferred = Q.defer();
 
   wol.wake(mac, (error) => {
@@ -52,9 +43,9 @@ function wakeOnLan(mac) {
   });
 
   return deferred.promise;
-}
+};
 
-function ssdpDiscover(ssdpClient, st, filter) {
+const ssdpDiscover = (ssdpClient, st, filter) => {
   const deferred = Q.defer();
   let timer = null;
 
@@ -79,43 +70,53 @@ function ssdpDiscover(ssdpClient, st, filter) {
   }, 4000);
 
   return deferred.promise;
-}
-
-
-BraviaDiscovery.prototype.getUrl = () => {
-  const deferred = Q.defer();
-
-  const self = this;
-  this.getIp().then((ip) => {
-    deferred.resolve(self.url.format({ ip }));
-  }, deferred.reject);
-
-  return deferred.promise;
 };
 
-BraviaDiscovery.prototype.getIp = () => {
-  const deferred = Q.defer();
+class BraviaDiscovery {
+  constructor(ip, mac, filter) {
+    this.ssdpClient = new SsdpClient();
+    this.st = 'urn:schemas-sony-com:service:IRCC:1';
+    this.url = `http://${ip}/sony`;
 
-  if (this.ip) {
-    deferred.resolve(this.ip);
-  } else {
-    const self = this;
-    const discover = () => {
-      ssdpDiscover(self.ssdpClient, self.st, self.filter).then((ip) => {
-        self.ip = ip;
-        deferred.resolve(ip);
-      }, deferred.reject);
-    };
-
-    if (this.mac) {
-      wakeOnLan(this.mac).delay(1000).fin(discover);
-    } else {
-      discover();
-    }
+    this.ip = ip;
+    this.mac = mac;
+    this.filter = filter;
   }
 
-  return deferred.promise;
-};
+  getUrl() {
+    const deferred = Q.defer();
 
+    const self = this;
+    this.getIp().then((ip) => {
+      deferred.resolve(self.url(ip));
+    }, deferred.reject);
+
+    return deferred.promise;
+  }
+
+  getIp() {
+    const deferred = Q.defer();
+
+    if (this.ip) {
+      deferred.resolve(this.ip);
+    } else {
+      const self = this;
+      const discover = () => {
+        ssdpDiscover(self.ssdpClient, self.st, self.filter).then((ip) => {
+          self.ip = ip;
+          deferred.resolve(ip);
+        }, deferred.reject);
+      };
+
+      if (this.mac) {
+        wakeOnLan(this.mac).delay(1000).fin(discover);
+      } else {
+        discover();
+      }
+    }
+
+    return deferred.promise;
+  }
+}
 
 module.exports = BraviaDiscovery;

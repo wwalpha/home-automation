@@ -1,31 +1,32 @@
-var readline = require('readline');
-var Bravia = require('./bravia');
+const readline = require('readline');
+const Bravia = require('./bravia');
 
-var bravia = new Bravia();
+const bravia = new Bravia('172.16.81.25');
 
-bravia.authenticate().then(function(cookie) {
+bravia.authenticate().then((cookie) => {
+  console.log(3333);
   if (cookie) {
     console.log(cookie);
   } else {
-    var rl = readline.createInterface({
+    const rl = readline.createInterface({
       input: process.stdin,
-      output: process.stdout
+      output: process.stdout,
     });
 
-    rl.question('Please enter the 4-digit code shown on your TV: ', function(code) {
-      bravia.authenticate(code).then(function(cookie) {
-        if (cookie) {
-          console.log(cookie);
+    rl.question('Please enter the 4-digit code shown on your TV: ', (code) => {
+      bravia.authenticate(code).then((cookie1) => {
+        if (cookie1) {
+          console.log(cookie1);
         } else {
           console.log('Registration failed');
         }
-      }, function(error) {
+      }, (error) => {
         console.log(error);
       });
 
       rl.close();
     });
   }
-}, function(error) {
+}, (error) => {
   console.log(error);
 });
