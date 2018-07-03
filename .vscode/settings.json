@@ -1,9 +1,7 @@
 {
-  "eslint.enable": true,
-  "eslint.autoFixOnSave": true,
-  "eslint.run": "onSave",
-  "eslint.workingDirectories": [
-    "src"
-  ],
+  "tslint.autoFixOnSave": true,
+  "tslint.enable": true,
+  "tslint.run": "onSave",
+  "tslint.jsEnable": true,
   "python.pythonPath": "D:\\Code\\Tools\\Python36"
 }

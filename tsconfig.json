@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
     "rootDirs": [
-      "./src",
-      "./typings"
+      "./src"
     ],
     "outDir": "dist",
     "target": "es6",
@@ -25,28 +24,12 @@
     "paths": {
       "src/*": [
         "./src/*"
-      ],
-      "utils/*": [
-        "./src/utils/*"
-      ],
-      "actions/*": [
-        "./src/actions/*"
-      ],
-      "components/*": [
-        "./src/components/*"
-      ],
-      "models/*": [
-        "./src/models/*"
-      ],
-      "ActionTypes": [
-        "./src/constants/ActionTypes"
       ]
     }
   },
   "compileOnSave": true,
   "include": [
-    "src/**/*",
-    "index.tsx",
+    "src/**/*"
   ],
   "files": [
     "./typings/types.d.ts",
