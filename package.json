@@ -18,7 +18,7 @@
   "homepage": "https://github.com/wwalpha/home-automation#readme",
   "dependencies": {
     "@firebase/app-types": "^0.3.2",
-    "aws-sdk": "^2.267.1",
+    "aws-sdk": "^2.814.0",
     "express": "^4.16.3",
     "firebase": "^5.1.0",
     "google-home-notifier": "^1.2.0",
