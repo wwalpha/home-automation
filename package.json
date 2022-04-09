@@ -22,7 +22,7 @@
     "express": "^4.16.3",
     "firebase": "^5.1.0",
     "google-home-notifier": "^1.2.0",
-    "moment": "^2.22.2",
+    "moment": "^2.29.2",
     "node-ssdp": "^3.3.0",
     "node-upnp-ssdp": "^0.1.1",
     "q": "^1.5.1",
